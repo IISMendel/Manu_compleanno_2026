@@ -126,6 +126,41 @@
   .scope-card .price{ font-size:12px; color:var(--starlight); letter-spacing:.04em; text-transform:uppercase; margin-bottom:8px; display:block; }
   .scope-card p{ font-size:14px; }
 
+  /* ZOOM SU HOVER FOTO */
+  figure:has(> img.photo){ overflow:hidden; border-radius:14px; }
+  figure > img.photo{ transition:transform .55s cubic-bezier(.2,.8,.2,1); }
+  figure:hover > img.photo{ transform:scale(1.09); }
+  .scope-card img, .hero-photo img{ transition:transform .55s cubic-bezier(.2,.8,.2,1); }
+  .scope-card:hover img{ transform:scale(1.1); }
+  .hero-photo:hover img{ transform:scale(1.04); }
+
+  /* SFONDO FOTOGRAFICO A SCORRIMENTO */
+  #bg-slideshow{ position:fixed; inset:0; z-index:0; opacity:0; transition:opacity 1.2s ease; }
+  #bg-slideshow.on{ opacity:1; }
+  #bg-slideshow .slide{ position:absolute; inset:0; background-size:cover; background-position:center; opacity:0; animation:slideCycle 64s infinite; }
+  #bg-slideshow .slide:nth-child(1){ background-image:url('images/via-lattea-arco.jpg'); animation-delay:0s; }
+  #bg-slideshow .slide:nth-child(2){ background-image:url('images/nebulosa-orione.jpg'); animation-delay:8s; }
+  #bg-slideshow .slide:nth-child(3){ background-image:url('images/andromeda.jpg'); animation-delay:16s; }
+  #bg-slideshow .slide:nth-child(4){ background-image:url('images/saturno-cassini.jpg'); animation-delay:24s; }
+  #bg-slideshow .slide:nth-child(5){ background-image:url('images/pilastri-creazione.jpg'); animation-delay:32s; }
+  #bg-slideshow .slide:nth-child(6){ background-image:url('images/via-lattea-deserto.jpg'); animation-delay:40s; }
+  #bg-slideshow .slide:nth-child(7){ background-image:url('images/galassia-vortice.jpg'); animation-delay:48s; }
+  #bg-slideshow .slide:nth-child(8){ background-image:url('images/buco-nero-m87.jpg'); animation-delay:56s; }
+  #bg-slideshow .scrim{ position:absolute; inset:0; background:linear-gradient(180deg, rgba(5,7,15,.55), rgba(5,7,15,.82) 40%, var(--bg-void) 92%); }
+  @keyframes slideCycle{
+    0%{ opacity:0; } 3%{ opacity:.38; } 11%{ opacity:.38; } 14%{ opacity:0; } 100%{ opacity:0; }
+  }
+  @media (prefers-reduced-motion: reduce){ #bg-slideshow{ display:none; } figure > img.photo, .scope-card img{ transition:none; } }
+
+  /* CITAZIONI */
+  .quote-wall{ display:grid; grid-template-columns:repeat(auto-fit,minmax(280px,1fr)); gap:22px; }
+  .quote-card{ border-left:2px solid var(--nebula); padding:6px 0 6px 22px; }
+  .quote-card p.q{ font-family:'Fraunces',serif; font-style:italic; font-size:19px; line-height:1.5; color:var(--ink); }
+  .quote-card p.q::before{ content:'"'; }
+  .quote-card p.q::after{ content:'"'; }
+  .quote-card .who{ margin-top:12px; font-size:13px; color:var(--nebula); letter-spacing:.03em; }
+  .quote-card .who span{ color:var(--ink-dim); }
+
   footer{ text-align:center; padding:50px 24px; font-size:13px; color:var(--ink-dim); }
   footer .btn-top{ display:inline-block; margin-top:18px; padding:10px 20px; border:1px solid var(--line); border-radius:999px; color:var(--ink-dim); text-decoration:none; font-size:12px; }
   footer .btn-top:hover{ border-color:var(--nebula); color:var(--ink); }
@@ -136,6 +171,11 @@
 <body>
 
 <canvas id="stars-canvas"></canvas>
+<div id="bg-slideshow">
+  <div class="slide"></div><div class="slide"></div><div class="slide"></div><div class="slide"></div>
+  <div class="slide"></div><div class="slide"></div><div class="slide"></div><div class="slide"></div>
+  <div class="scrim"></div>
+</div>
 <div class="veil"></div>
 
 <main>
@@ -712,6 +752,65 @@
     </div>
   </section>
 
+  <!-- CITAZIONI -->
+  <section id="citazioni">
+    <div class="wrap">
+      <div class="eyebrow">Parole da chi ha guardato più lontano</div>
+      <h2>Voci <em>tra le stelle</em></h2>
+      <p class="lede">Scienziati, scrittori, sognatori. Persone diverse, la stessa domanda in testa: cosa c'è, davvero, là fuori.</p>
+      <div class="quote-wall">
+        <div class="quote-card">
+          <p class="q">Da qualche parte, qualcosa di incredibile aspetta di essere scoperto.</p>
+          <div class="who">Carl Sagan <span>· astronomo, divulgatore</span></div>
+        </div>
+        <div class="quote-card">
+          <p class="q">Siamo fatti di materia di stelle.</p>
+          <div class="who">Carl Sagan <span>· Cosmos, 1980</span></div>
+        </div>
+        <div class="quote-card">
+          <p class="q">Guarda le stelle, non i tuoi piedi.</p>
+          <div class="who">Stephen Hawking <span>· fisico teorico</span></div>
+        </div>
+        <div class="quote-card">
+          <p class="q">L'intelligenza è la capacità di adattarsi al cambiamento.</p>
+          <div class="who">Stephen Hawking <span>· fisico teorico</span></div>
+        </div>
+        <div class="quote-card">
+          <p class="q">Guarda in profondità nella natura, e capirai tutto molto meglio.</p>
+          <div class="who">Albert Einstein <span>· fisico</span></div>
+        </div>
+        <div class="quote-card">
+          <p class="q">L'immaginazione è più importante della conoscenza.</p>
+          <div class="who">Albert Einstein <span>· fisico</span></div>
+        </div>
+        <div class="quote-card">
+          <p class="q">La frase più eccitante da sentire in scienza non è "Eureka!", ma "Che strano...".</p>
+          <div class="who">Isaac Asimov <span>· scrittore, biochimico</span></div>
+        </div>
+        <div class="quote-card">
+          <p class="q">La vita trova sempre un modo.</p>
+          <div class="who">Ian Malcolm <span>· Jurassic Park, Michael Crichton</span></div>
+        </div>
+        <div class="quote-card">
+          <p class="q">L'universo non ti deve proprio niente.</p>
+          <div class="who">Neil deGrasse Tyson <span>· astrofisico</span></div>
+        </div>
+        <div class="quote-card">
+          <p class="q">Il cosmo è dentro di noi. Siamo fatti di materia stellare che riflette su se stessa.</p>
+          <div class="who">Carl Sagan <span>· Cosmos, 1980</span></div>
+        </div>
+        <div class="quote-card">
+          <p class="q">Il tempo è relativo: il suo unico valore sta in ciò che ne facciamo.</p>
+          <div class="who">H.G. Wells <span>· La macchina del tempo</span></div>
+        </div>
+        <div class="quote-card">
+          <p class="q">Due cose sono infinite: l'universo e la stupidità umana. E dell'universo non sono ancora sicuro.</p>
+          <div class="who">Albert Einstein <span>· fisico</span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
   <!-- BIBLIOGRAFIA -->
   <section id="bibliografia">
     <div class="wrap">
@@ -917,6 +1016,21 @@
     renderer.render(scene, camera);
   }
   animate();
+})();
+
+/* ============ SFONDO FOTOGRAFICO: acceso ovunque, spento sulle citazioni ============ */
+(function(){
+  const bg = document.getElementById('bg-slideshow');
+  const quotesSection = document.getElementById('citazioni');
+  if(!bg) return;
+  bg.classList.add('on');
+  if(!quotesSection || !('IntersectionObserver' in window)) return;
+  const io = new IntersectionObserver((entries)=>{
+    entries.forEach(entry=>{
+      bg.classList.toggle('on', !entry.isIntersecting);
+    });
+  }, { threshold: 0.35 });
+  io.observe(quotesSection);
 })();
 </script>
 </body>
