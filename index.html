@@ -39,8 +39,7 @@
   main{ position:relative; z-index:2; }
 
   .wrap{ max-width:980px; margin:0 auto; padding:0 24px; }
-  section{ padding:100px 0; border-bottom:1px solid var(--line); }
-  section:last-of-type{ border-bottom:none; }
+  section{ padding:100px 0; }
   .eyebrow{ text-transform:uppercase; letter-spacing:.18em; font-size:12px; color:var(--nebula); font-weight:600; margin-bottom:14px; }
   h2{ font-size:clamp(28px,4vw,44px); margin-bottom:18px; }
   .lede{ color:var(--ink-dim); font-size:18px; max-width:640px; line-height:1.6; margin-bottom:44px; }
@@ -128,19 +127,6 @@
   .scope-card .price{ font-size:12px; color:var(--starlight); letter-spacing:.04em; text-transform:uppercase; margin-bottom:8px; display:block; }
   .scope-card p{ font-size:14px; }
 
-  /* SFONDO FOTOGRAFICO CHE SCORRE CON LA PAGINA (per sezione, escluse citazioni/bibliografia/dedica) */
-  .photo-bg{ position:relative; background-size:cover; background-position:center; background-attachment:scroll; }
-  .photo-bg::before{ content:''; position:absolute; inset:0; background:linear-gradient(180deg, rgba(5,7,15,.86), rgba(5,7,15,.93) 55%, rgba(5,7,15,.97)); z-index:0; }
-  .photo-bg > .wrap{ position:relative; z-index:1; }
-  #eclissi.photo-bg{ background-image:url('eclisse-corona.jpg'); }
-  #galassie.photo-bg{ background-image:url('pilastri-creazione.jpg'); }
-  #matematica.photo-bg{ background-image:url('via-lattea-arco.jpg'); }
-  #fenomeni.photo-bg{ background-image:url('cometa-neowise.jpg'); }
-  #parabiago.photo-bg{ background-image:url('costellazione-orione.jpg'); }
-  #misteri.photo-bg{ background-image:url('buco-nero-m87.jpg'); }
-  #esopianeti.photo-bg{ background-image:url('trappist-1.jpg'); }
-  #diretta.photo-bg{ background-image:url('stazione-spaziale-iss.jpg'); }
-
   /* CITAZIONI */
   .quote-wall{ display:grid; grid-template-columns:repeat(auto-fit,minmax(280px,1fr)); gap:22px; }
   .quote-card{ border-left:2px solid var(--nebula); padding:6px 0 6px 22px; }
@@ -193,7 +179,7 @@
   </section>
 
   <!-- ECLISSI -->
-  <section id="eclissi" class="photo-bg">
+  <section id="eclissi">
     <div class="wrap">
       <div class="eyebrow">La rivincita</div>
       <h2>Quest'anno il cielo <em>si è nascosto</em>. L'anno prossimo no.</h2>
@@ -254,7 +240,7 @@
   </section>
 
   <!-- GALASSIE & BIG BANG -->
-  <section id="galassie" class="photo-bg">
+  <section id="galassie">
     <div class="wrap">
       <div class="eyebrow">02 — Fuori dal cortile di casa</div>
       <h2>Galassie, e l'istante <em>in cui tutto è cominciato</em></h2>
@@ -293,7 +279,7 @@
   </section>
 
   <!-- MATEMATICA DELL'UNIVERSO -->
-  <section id="matematica" class="photo-bg">
+  <section id="matematica">
     <div class="wrap">
       <div class="eyebrow">03 — Il linguaggio segreto</div>
       <h2>La <em>matematica</em> che tiene insieme il cosmo</h2>
@@ -319,12 +305,42 @@
           <h3>N = R* · fp · ne · fl · fi · fc · L</h3>
           <p>Quante civiltà comunicanti potrebbero esistere nella nostra galassia in questo momento? Ne parliamo meglio più giù — con tanto di brivido incluso.</p>
         </div>
+        <div class="card">
+          <span class="tag">Legge di Newton</span>
+          <h3>F = G · (m₁m₂)/r²</h3>
+          <p>La forza che tiene in orbita ogni pianeta, ogni luna, ogni galassia: due masse qualsiasi si attraggono con una forza che dipende da quanto pesano e da quanto sono lontane. Vale ovunque nell'universo, sempre.</p>
+        </div>
+        <div class="card">
+          <span class="tag">Raggio di Schwarzschild</span>
+          <h3>Rs = 2GM/c²</h3>
+          <p>La formula che dice quanto piccola deve diventare una massa perché nemmeno la luce riesca più a scappare: è il confine esatto oltre cui nasce un buco nero.</p>
+        </div>
+        <div class="card">
+          <span class="tag">Velocità di fuga</span>
+          <h3>v = √(2GM/r)</h3>
+          <p>La velocità minima per staccarsi per sempre dalla gravità di un pianeta. Sulla Terra sono circa 11,2 km/s — su un buco nero, nessuna velocità basta più: nemmeno quella della luce.</p>
+        </div>
+        <div class="card">
+          <span class="tag">Redshift cosmologico</span>
+          <h3>z = (λoss − λemessa) / λemessa</h3>
+          <p>Come misuriamo davvero quanto un oggetto si sta allontanando: la sua luce si "stira" verso il rosso, ed è proprio da questo numero che sappiamo che l'universo si espande.</p>
+        </div>
+        <div class="card">
+          <span class="tag">Sezione aurea</span>
+          <h3>φ = (1+√5)/2 ≈ 1,618</h3>
+          <p>Lo stesso rapporto che disegna le bracce a spirale di una galassia si ritrova in un girasole, in una conchiglia, nelle proporzioni di un volto. La matematica non distingue tra piccolo e immenso.</p>
+        </div>
+        <div class="card">
+          <span class="tag">Lunghezza di Planck</span>
+          <h3>ℓP = √(ℏG/c³) ≈ 1,6 × 10⁻³⁵ m</h3>
+          <p>La distanza più piccola che abbia senso misurare nell'universo: sotto questa scala, anche il concetto stesso di "spazio" smette di funzionare come lo intendiamo.</p>
+        </div>
       </div>
     </div>
   </section>
 
   <!-- FENOMENI PROSSIMI 100 ANNI -->
-  <section id="fenomeni" class="photo-bg">
+  <section id="fenomeni">
     <div class="wrap">
       <div class="eyebrow">04 — Segna il calendario</div>
       <h2>Cosa vedremo <em>alzando gli occhi</em></h2>
@@ -365,7 +381,7 @@
   </section>
 
   <!-- PARABIAGO -->
-  <section id="parabiago" class="photo-bg">
+  <section id="parabiago">
     <div class="wrap">
       <div class="eyebrow">05 — Da casa tua</div>
       <h2>Il cielo visto da <em>Parabiago</em></h2>
@@ -644,7 +660,7 @@
   </section>
 
   <!-- BUCHI NERI E MISTERI -->
-  <section id="misteri" class="photo-bg">
+  <section id="misteri">
     <div class="wrap">
       <div class="eyebrow">Oltre la fisica come la conosciamo</div>
       <h2>Buchi neri, <em>e i confini dello spazio-tempo</em></h2>
@@ -688,7 +704,7 @@
   </section>
 
   <!-- ESOPIANETI E MONDI LONTANI -->
-  <section id="esopianeti" class="photo-bg">
+  <section id="esopianeti">
     <div class="wrap">
       <div class="eyebrow">Oltre il Sistema Solare</div>
       <h2>Mondi <em>attorno ad altre stelle</em></h2>
@@ -717,7 +733,7 @@
   </section>
 
   <!-- LINK IN DIRETTA -->
-  <section id="diretta" class="photo-bg">
+  <section id="diretta">
     <div class="wrap">
       <div class="eyebrow">In tempo reale</div>
       <h2>Guarda lo spazio <em>proprio adesso</em></h2>
@@ -873,6 +889,16 @@
         <div class="card"><h3>Event Horizon Telescope</h3><p>Il progetto che ha fotografato per primo un buco nero reale.</p><a class="ext" href="https://eventhorizontelescope.org/" target="_blank" rel="noopener">eventhorizontelescope.org</a></div>
         <div class="card"><h3>SETI Institute</h3><p>L'organizzazione che dal 1984 cerca segnali di intelligenze extraterrestri.</p><a class="ext" href="https://www.seti.org/" target="_blank" rel="noopener">seti.org</a></div>
         <div class="card"><h3>Breakthrough Listen</h3><p>Il più grande progetto di ricerca SETI mai finanziato: dati aperti a tutti.</p><a class="ext" href="https://breakthroughinitiatives.org/initiative/1" target="_blank" rel="noopener">breakthroughinitiatives.org</a></div>
+      </div>
+
+      <h3 style="font-size:15px; letter-spacing:.04em; text-transform:uppercase; color:var(--aurora); margin-bottom:14px;">Simulatori 3D e planetari interattivi</h3>
+      <div class="grid" style="margin-bottom:34px;">
+        <div class="card"><h3>Solar System Scope</h3><p>Un simulatore 3D del Sistema Solare bellissimo e navigabile, simile nello spirito a quello qui sopra ma ancora più dettagliato.</p><a class="ext" href="https://www.solarsystemscope.com/" target="_blank" rel="noopener">solarsystemscope.com</a></div>
+        <div class="card"><h3>NASA Eyes on Exoplanets</h3><p>Vola letteralmente fino a stelle ed esopianeti reali, in un simulatore 3D scaricabile.</p><a class="ext" href="https://eyes.nasa.gov/apps/exo/" target="_blank" rel="noopener">eyes.nasa.gov/apps/exo</a></div>
+        <div class="card"><h3>WorldWide Telescope</h3><p>Un "telescopio virtuale" nato da un progetto Microsoft Research: unisce immagini reali da decine di osservatori in un cielo esplorabile.</p><a class="ext" href="https://worldwidetelescope.org/" target="_blank" rel="noopener">worldwidetelescope.org</a></div>
+        <div class="card"><h3>Celestia</h3><p>Un simulatore spaziale open source e gratuito: si vola liberamente tra pianeti, stelle e galassie reali, in scala.</p><a class="ext" href="https://celestiaproject.space/" target="_blank" rel="noopener">celestiaproject.space</a></div>
+        <div class="card"><h3>Wikisky</h3><p>Un atlante del cielo interattivo, costruito su immagini astronomiche reali cliccabili e ricercabili.</p><a class="ext" href="https://www.wikisky.org/" target="_blank" rel="noopener">wikisky.org</a></div>
+        <div class="card"><h3>NOIRLab</h3><p>Le immagini e le scoperte degli osservatori terrestri più avanzati al mondo, dal Cile alle Hawaii.</p><a class="ext" href="https://noirlab.edu/" target="_blank" rel="noopener">noirlab.edu</a></div>
       </div>
 
       <h3 style="font-size:15px; letter-spacing:.04em; text-transform:uppercase; color:var(--aurora); margin-bottom:14px;">Divulgazione e approfondimento</h3>
