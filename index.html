@@ -1,0 +1,672 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Buon Compleanno, Manu — Sotto lo stesso cielo</title>
+<meta name="description" content="Un viaggio tra pianeti, galassie e stelle per il compleanno di Manu, 23 agosto." />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;1,9..144,500&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<style>
+  :root{
+    --bg-void:#05070f;
+    --bg-deep:#0b0f22;
+    --nebula:#a56dff;
+    --starlight:#f4cf6e;
+    --aurora:#4fd8c4;
+    --ember:#ff8a5c;
+    --ink:#eef0fb;
+    --ink-dim:#9aa0c3;
+    --line:rgba(238,240,251,.12);
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  html{scroll-behavior:smooth;}
+  body{
+    background:var(--bg-void);
+    color:var(--ink);
+    font-family:'Space Grotesk', sans-serif;
+    overflow-x:hidden;
+    -webkit-font-smoothing:antialiased;
+  }
+  h1,h2,h3,.display{ font-family:'Fraunces', serif; font-weight:600; letter-spacing:-.01em; }
+  em{ font-style:italic; font-family:'Fraunces', serif; color:var(--starlight); }
+  a{ color:var(--aurora); }
+  #stars-canvas{ position:fixed; inset:0; width:100vw; height:100vh; z-index:0; }
+  .veil{ position:fixed; inset:0; z-index:1; pointer-events:none;
+    background:radial-gradient(ellipse at 50% -10%, rgba(165,109,255,.14), transparent 55%),
+               radial-gradient(ellipse at 90% 110%, rgba(79,216,196,.10), transparent 50%); }
+  main{ position:relative; z-index:2; }
+
+  .wrap{ max-width:980px; margin:0 auto; padding:0 24px; }
+  section{ padding:100px 0; border-bottom:1px solid var(--line); }
+  section:last-of-type{ border-bottom:none; }
+  .eyebrow{ text-transform:uppercase; letter-spacing:.18em; font-size:12px; color:var(--nebula); font-weight:600; margin-bottom:14px; }
+  h2{ font-size:clamp(28px,4vw,44px); margin-bottom:18px; }
+  .lede{ color:var(--ink-dim); font-size:18px; max-width:640px; line-height:1.6; margin-bottom:44px; }
+  p{ line-height:1.7; color:var(--ink-dim); }
+
+  /* HERO */
+  .hero{ min-height:100vh; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; border-bottom:1px solid var(--line); padding:40px 24px; }
+  .hero .eyebrow{ text-align:center; }
+  .hero h1{ font-size:clamp(40px,7vw,84px); line-height:1.02; max-width:900px; }
+  .hero .date{ margin-top:22px; color:var(--ink-dim); font-size:15px; letter-spacing:.05em; }
+  .hero .sub{ margin-top:26px; max-width:560px; color:var(--ink-dim); font-size:17px; line-height:1.7; }
+  .scroll-cue{ margin-top:56px; font-size:12px; letter-spacing:.15em; text-transform:uppercase; color:var(--nebula); opacity:.85; animation:bob 2.4s ease-in-out infinite; }
+  @keyframes bob{ 0%,100%{transform:translateY(0)} 50%{transform:translateY(8px)} }
+
+  /* SOLAR SYSTEM */
+  #solar-canvas{ width:100%; height:520px; border-radius:20px; background:radial-gradient(ellipse at 50% 40%, rgba(165,109,255,.08), transparent 70%); cursor:grab; touch-action:none; }
+  #solar-canvas:active{ cursor:grabbing; }
+  .planet-info{ margin-top:22px; padding:22px 26px; border:1px solid var(--line); border-radius:16px; background:rgba(238,240,251,.03); min-height:96px; transition:opacity .25s ease; }
+  .planet-info .pname{ font-family:'Fraunces',serif; font-size:22px; margin-bottom:6px; }
+  .planet-info .pmeta{ font-size:13px; color:var(--nebula); letter-spacing:.04em; text-transform:uppercase; margin-bottom:10px; }
+  .hint{ font-size:13px; color:var(--ink-dim); margin-top:14px; text-align:center; }
+
+  /* CARDS GRID */
+  .grid{ display:grid; grid-template-columns:repeat(auto-fit,minmax(260px,1fr)); gap:20px; }
+  .card{ border:1px solid var(--line); border-radius:16px; padding:26px; background:rgba(238,240,251,.025); transition:transform .25s ease, border-color .25s ease, background .25s ease; }
+  .card:hover{ transform:translateY(-4px); border-color:rgba(165,109,255,.4); background:rgba(238,240,251,.05); }
+  .card h3{ font-size:19px; margin-bottom:10px; }
+  .card p{ font-size:14.5px; }
+  .card .tag{ display:inline-block; font-size:11px; letter-spacing:.08em; text-transform:uppercase; color:var(--aurora); margin-bottom:12px; }
+  .card a.ext{ display:inline-flex; align-items:center; gap:6px; margin-top:14px; font-size:13px; font-weight:600; text-decoration:none; }
+  .card a.ext::after{ content:'→'; transition:transform .2s ease; }
+  .card a.ext:hover::after{ transform:translateX(3px); }
+
+  /* TIMELINE (fenomeni) */
+  .timeline{ position:relative; padding-left:28px; border-left:1px solid var(--line); }
+  .tl-item{ position:relative; padding-bottom:34px; }
+  .tl-item:last-child{ padding-bottom:0; }
+  .tl-item::before{ content:''; position:absolute; left:-33px; top:4px; width:9px; height:9px; border-radius:50%; background:var(--starlight); box-shadow:0 0 12px var(--starlight); }
+  .tl-year{ font-family:'Fraunces',serif; font-size:20px; color:var(--starlight); }
+  .tl-item h4{ font-size:17px; margin:4px 0 6px; }
+  .tl-item p{ font-size:14.5px; }
+
+  /* PARABIAGO */
+  .sky-note{ display:flex; gap:30px; flex-wrap:wrap; align-items:flex-start; }
+  .sky-note .num{ font-family:'Fraunces',serif; font-size:15px; color:var(--nebula); min-width:90px; }
+  .sky-fact{ flex:1; min-width:260px; padding:20px 0; border-top:1px solid var(--line); display:flex; gap:24px; }
+  .sky-fact:first-child{ border-top:none; padding-top:0; }
+
+  /* SETI */
+  .signal-box{ border:1px solid rgba(255,138,92,.35); background:rgba(255,138,92,.05); border-radius:16px; padding:28px; margin-bottom:20px; }
+  .signal-box h3{ color:var(--ember); font-size:19px; margin-bottom:8px; }
+  .drake{ font-family:'Fraunces',serif; font-style:italic; font-size:22px; text-align:center; padding:26px; border:1px dashed var(--line); border-radius:16px; margin:26px 0; color:var(--starlight); }
+
+  /* PREVIOUS PAGE LINK */
+  .legacy{ display:flex; align-items:center; justify-content:space-between; gap:24px; flex-wrap:wrap; border:1px solid var(--line); border-radius:18px; padding:28px 30px; background:linear-gradient(120deg, rgba(165,109,255,.08), rgba(79,216,196,.05)); }
+  .legacy .btn{ display:inline-block; padding:12px 22px; border-radius:999px; background:var(--nebula); color:#0b0f22; font-weight:600; text-decoration:none; font-size:14px; white-space:nowrap; }
+
+  /* DEDICA */
+  .dedica{ text-align:center; padding:120px 24px; }
+  .dedica .star-icon{ font-size:34px; margin-bottom:22px; color:var(--starlight); }
+  .dedica p.msg{ font-family:'Fraunces',serif; font-size:clamp(20px,3vw,28px); font-style:italic; max-width:640px; margin:0 auto; line-height:1.6; color:var(--ink); }
+  .dedica .signoff{ margin-top:28px; font-size:14px; color:var(--ink-dim); font-family:'Space Grotesk',sans-serif; font-style:normal; }
+
+  /* IMMAGINI */
+  figure{ margin:0; }
+  .photo{ width:100%; aspect-ratio:4/3; object-fit:cover; border-radius:14px; display:block; background:linear-gradient(135deg, rgba(165,109,255,.12), rgba(79,216,196,.08)); }
+  .photo-wide{ aspect-ratio:16/7; }
+  figcaption{ font-size:12.5px; color:var(--ink-dim); margin-top:10px; }
+  figcaption .src{ color:var(--nebula); }
+  .hero-photo{ margin:40px auto 0; max-width:820px; }
+  .hero-photo .photo{ aspect-ratio:16/8; border-radius:20px; box-shadow:0 30px 80px rgba(0,0,0,.5); }
+
+  /* GALLERIA */
+  .gallery{ column-count:3; column-gap:18px; }
+  .gallery figure{ break-inside:avoid; margin-bottom:18px; }
+  @media(max-width:800px){ .gallery{ column-count:2; } }
+  @media(max-width:520px){ .gallery{ column-count:1; } }
+
+  /* TELESCOPI */
+  .scope-card{ display:flex; gap:20px; border:1px solid var(--line); border-radius:16px; padding:22px; background:rgba(238,240,251,.025); align-items:flex-start; }
+  .scope-card img{ width:130px; height:130px; object-fit:cover; border-radius:12px; flex-shrink:0; }
+  .scope-card h3{ font-size:17px; margin-bottom:6px; }
+  .scope-card .price{ font-size:12px; color:var(--starlight); letter-spacing:.04em; text-transform:uppercase; margin-bottom:8px; display:block; }
+  .scope-card p{ font-size:14px; }
+
+  footer{ text-align:center; padding:50px 24px; font-size:13px; color:var(--ink-dim); }
+  footer .btn-top{ display:inline-block; margin-top:18px; padding:10px 20px; border:1px solid var(--line); border-radius:999px; color:var(--ink-dim); text-decoration:none; font-size:12px; }
+  footer .btn-top:hover{ border-color:var(--nebula); color:var(--ink); }
+
+  @media(max-width:640px){ section{ padding:70px 0; } #solar-canvas{ height:400px; } }
+</style>
+</head>
+<body>
+
+<canvas id="stars-canvas"></canvas>
+<div class="veil"></div>
+
+<main>
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="eyebrow">23 agosto · un anno, tutto il cielo</div>
+    <h1>Buon Compleanno,<br><em>Manu</em></h1>
+    <div class="date">Villa Cortese ↔ Parabiago, stessa volta celeste</div>
+    <p class="sub">L'anno dell'eclissi che qui si è vista poco, per colpa delle nuvole. Allora quest'anno il cielo te lo porto io, tutto intero: pianeti, galassie, il Big Bang, la matematica che tiene insieme l'universo — e qualche mistero, per chi come te guarda sempre un po' più in alto.</p>
+    <div class="scroll-cue">scorri ↓</div>
+    <figure class="hero-photo">
+      <img class="photo photo-wide" src="images/eclisse-corona.jpg" alt="Corona solare durante un'eclissi totale">
+      <figcaption>Cerca: <span class="src">"eclissi solare totale corona NASA"</span> — foto ufficiale NASA/ESA, formato largo</figcaption>
+    </figure>
+  </section>
+
+  <!-- ECLISSI -->
+  <section id="eclissi">
+    <div class="wrap">
+      <div class="eyebrow">La rivincita</div>
+      <h2>Quest'anno il cielo <em>si è nascosto</em>. L'anno prossimo no.</h2>
+      <p class="lede">Le nuvole hanno vinto una battaglia, non la guerra. Il cosmo continua il suo giro, puntuale, e prima o poi la luce arriva comunque.</p>
+      <div class="grid">
+        <div class="card">
+          <span class="tag">Cos'è successo</span>
+          <h3>2026, il cielo coperto</h3>
+          <p>Un'eclissi non aspetta il meteo: la Luna copre il Sole allo stesso identico secondo, ovunque tu sia. Solo che quest'anno, da qui, c'erano le nuvole di mezzo. È successo ad astronomi di tutte le epoche — anche i più pazienti, a volte, guardano solo grigio.</p>
+        </div>
+        <div class="card">
+          <span class="tag">Come funziona</span>
+          <h3>Un allineamento quasi impossibile</h3>
+          <p>Il Sole è 400 volte più grande della Luna, ma anche 400 volte più lontano: per un caso cosmico quasi assurdo, dalla Terra i due dischi appaiono della stessa dimensione. Solo così la Luna può coprire perfettamente il Sole.</p>
+        </div>
+        <div class="card">
+          <span class="tag">La prossima occasione</span>
+          <h3>12 agosto 2026 — Spagna e Islanda</h3>
+          <p>Totale su Groenlandia, Islanda e Spagna nel tardo pomeriggio: la più vicina e comoda da raggiungere per chi parte dall'Italia. Da qui, parziale ma comunque suggestiva.</p>
+        </div>
+        <div class="card">
+          <span class="tag">Da non perdere</span>
+          <h3>2 agosto 2027 — Nord Africa</h3>
+          <p>Fino a 6 minuti e 23 secondi di totalità su Egitto e Nord Africa: una delle eclissi più lunghe che si possano verificare sulla Terra. Se una vale un viaggio, è questa.</p>
+        </div>
+      </div>
+      <div class="gallery" style="margin-top:32px;">
+        <figure>
+          <img class="photo" src="images/eclisse-diamante.jpg" alt="Effetto anello di diamante durante un'eclissi solare">
+          <figcaption>Cerca: <span class="src">"eclissi anello di diamante diamond ring effect"</span></figcaption>
+        </figure>
+        <figure>
+          <img class="photo" src="images/eclisse-fasi.jpg" alt="Sequenza delle fasi di un'eclissi solare">
+          <figcaption>Cerca: <span class="src">"sequenza fasi eclissi solare composite"</span> — foto a più scatti affiancati</figcaption>
+        </figure>
+        <figure>
+          <img class="photo" src="images/eclisse-lunare-rossa.jpg" alt="Eclissi lunare totale, luna rossa">
+          <figcaption>Cerca: <span class="src">"eclissi lunare totale luna di sangue"</span></figcaption>
+        </figure>
+      </div>
+    </div>
+  </section>
+
+  <!-- SISTEMA SOLARE -->
+  <section id="solare">
+    <div class="wrap">
+      <div class="eyebrow">01 — Il vicinato</div>
+      <h2>Il Sistema Solare, <em>a portata di mano</em></h2>
+      <p class="lede">Trascina per ruotare, clicca un pianeta per leggere la sua storia. Otto mondi, un'unica stella, e noi da qualche parte nel mezzo.</p>
+      <canvas id="solar-canvas"></canvas>
+      <div class="planet-info" id="planet-info">
+        <div class="pname">Clicca un pianeta ↑</div>
+        <div class="pmeta">in attesa</div>
+        <p style="margin:0; color:var(--ink-dim); font-size:14px;">Ogni sfera che vedi è in scala di distanza relativa (non di dimensione reale — sennò Plutone sparirebbe).</p>
+      </div>
+      <p class="hint">🖱️ Trascina per ruotare la vista · Clicca un pianeta per i dettagli</p>
+    </div>
+  </section>
+
+  <!-- GALASSIE & BIG BANG -->
+  <section id="galassie">
+    <div class="wrap">
+      <div class="eyebrow">02 — Fuori dal cortile di casa</div>
+      <h2>Galassie, e l'istante <em>in cui tutto è cominciato</em></h2>
+      <p class="lede">13,8 miliardi di anni fa non esisteva niente — poi, in una frazione di secondo, è esistito tutto. Da lì, galassie su galassie, come schizzi di vernice su una tela nera.</p>
+      <div class="grid">
+        <div class="card">
+          <figure style="margin-bottom:16px;"><img class="photo" src="images/pilastri-creazione.jpg" alt="Pilastri della Creazione, Nebulosa dell'Aquila"><figcaption>Cerca: <span class="src">"Pillars of Creation James Webb"</span></figcaption></figure>
+          <span class="tag">Big Bang</span>
+          <h3>L'inizio di tutto</h3>
+          <p>Non un'esplosione nello spazio, ma l'espansione dello spazio stesso: in meno di un secondo l'universo è passato da infinitamente piccolo a un fiammifero di plasma, e non ha mai smesso di espandersi.</p>
+          <a class="ext" href="https://www.nasa.gov/universe/" target="_blank" rel="noopener">NASA — Storia dell'universo</a>
+        </div>
+        <div class="card">
+          <figure style="margin-bottom:16px;"><img class="photo" src="images/via-lattea-arco.jpg" alt="Arco della Via Lattea in un cielo notturno"><figcaption>Cerca: <span class="src">"Via Lattea arco galattico notte foto"</span></figcaption></figure>
+          <span class="tag">Via Lattea</span>
+          <h3>Casa nostra</h3>
+          <p>200-400 miliardi di stelle, un disco a spirale di 100.000 anni luce. Il Sole ci mette circa 230 milioni di anni a fare un giro completo attorno al centro galattico.</p>
+          <a class="ext" href="https://esahubble.org/images/heic1608a/" target="_blank" rel="noopener">ESA/Hubble — Via Lattea</a>
+        </div>
+        <div class="card">
+          <figure style="margin-bottom:16px;"><img class="photo" src="images/andromeda.jpg" alt="Galassia di Andromeda"><figcaption>Cerca: <span class="src">"galassia Andromeda M31 Hubble"</span></figcaption></figure>
+          <span class="tag">Andromeda</span>
+          <h3>La galassia che ci sta venendo incontro</h3>
+          <p>A 2,5 milioni di anni luce, si avvicina a circa 110 km/s. Tra circa 4 miliardi di anni, Via Lattea e Andromeda si fonderanno in un'unica galassia.</p>
+          <a class="ext" href="https://science.nasa.gov/mission/hubble/science/science-highlights/milky-way-andromeda-collision/" target="_blank" rel="noopener">NASA — La futura fusione</a>
+        </div>
+        <div class="card">
+          <figure style="margin-bottom:16px;"><img class="photo" src="images/campo-profondo.jpg" alt="Hubble Deep Field, migliaia di galassie"><figcaption>Cerca: <span class="src">"Hubble Deep Field XDF"</span></figcaption></figure>
+          <span class="tag">Campo Profondo</span>
+          <h3>Un pixel di cielo, migliaia di galassie</h3>
+          <p>Nel 1995 Hubble puntò per 10 giorni un punto di cielo apparentemente vuoto grande quanto un granello di sabbia tenuto a distanza di un braccio. Il risultato: circa 3.000 galassie mai viste prima.</p>
+          <a class="ext" href="https://esahubble.org/images/opo9632c/" target="_blank" rel="noopener">Hubble Deep Field</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- MATEMATICA DELL'UNIVERSO -->
+  <section id="matematica">
+    <div class="wrap">
+      <div class="eyebrow">03 — Il linguaggio segreto</div>
+      <h2>La <em>matematica</em> che tiene insieme il cosmo</h2>
+      <p class="lede">L'universo non parla italiano, parla equazioni. Alcune delle più belle stanno qui sotto.</p>
+      <div class="grid">
+        <div class="card">
+          <span class="tag">Relatività generale</span>
+          <h3>E = mc²  &nbsp;·&nbsp;  Gμν = 8πTμν</h3>
+          <p>Einstein ci disse che massa ed energia sono la stessa cosa, e che la gravità non è una forza: è lo spazio-tempo che si curva sotto il peso della materia.</p>
+        </div>
+        <div class="card">
+          <span class="tag">Legge di Hubble</span>
+          <h3>v = H₀ · d</h3>
+          <p>Più una galassia è lontana, più velocemente si allontana da noi. È la prova matematica che l'universo si espande — e da cui si può "riavvolgere il nastro" fino al Big Bang.</p>
+        </div>
+        <div class="card">
+          <span class="tag">Legge di Keplero</span>
+          <h3>T² ∝ a³</h3>
+          <p>Il quadrato del tempo che un pianeta impie­ga a orbitare è proporzionale al cubo della sua distanza dal Sole. La stessa legge vale per ogni pianeta attorno a ogni stella dell'universo.</p>
+        </div>
+        <div class="card">
+          <span class="tag">Equazione di Drake</span>
+          <h3>N = R* · fp · ne · fl · fi · fc · L</h3>
+          <p>Quante civiltà comunicanti potrebbero esistere nella nostra galassia in questo momento? Ne parliamo meglio più giù — con tanto di brivido incluso.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FENOMENI PROSSIMI 100 ANNI -->
+  <section id="fenomeni">
+    <div class="wrap">
+      <div class="eyebrow">04 — Segna il calendario</div>
+      <h2>Cosa vedremo <em>alzando gli occhi</em></h2>
+      <p class="lede">Un secolo di cielo, in anteprima. Alcuni di questi eventi li vedrai tu, altri li vedranno i tuoi nipoti — ma sono già scritti nelle orbite.</p>
+      <div class="timeline">
+        <div class="tl-item">
+          <div class="tl-year">12 agosto 2026</div>
+          <h4>Eclissi totale di Sole — Spagna, Islanda, Groenlandia</h4>
+          <p>La rivincita di quest'anno: visibile bene dall'Europa occidentale, in particolare dalla Spagna nel tardo pomeriggio. Dall'Italia parziale.</p>
+        </div>
+        <div class="tl-item">
+          <div class="tl-year">2027</div>
+          <h4>Eclissi totale del "secolo" — Nord Africa</h4>
+          <p>2 agosto 2027: fino a 6 minuti e 23 secondi di totalità su Egitto e Nord Africa, una delle eclissi più lunghe possibili sulla Terra.</p>
+        </div>
+        <div class="tl-item">
+          <div class="tl-year">2029</div>
+          <h4>Avvicinamento dell'asteroide Apophis</h4>
+          <p>13 aprile 2029: un asteroide di 340 metri passerà più vicino alla Terra di alcuni satelliti geostazionari — visibile a occhio nudo da Europa, Africa e Asia.</p>
+        </div>
+        <div class="tl-item">
+          <div class="tl-year">2061</div>
+          <h4>Ritorno della cometa di Halley</h4>
+          <p>La cometa più famosa della storia tornerà visibile dalla Terra — l'ultima volta è stato nel 1986.</p>
+        </div>
+        <div class="tl-item">
+          <div class="tl-year">2117 e 2125</div>
+          <h4>Nuovi transiti di Venere</h4>
+          <p>Il piccolo disco nero di Venere che attraversa il Sole: un evento così raro che capita in coppie separate da oltre un secolo.</p>
+        </div>
+        <div class="tl-item">
+          <div class="tl-year">~2126</div>
+          <h4>Prossimo grande allineamento planetario</h4>
+          <p>Un secolo esatto da oggi: i pianeti torneranno a raggrupparsi in una configurazione osservabile rara nel cielo serale.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PARABIAGO -->
+  <section id="parabiago">
+    <div class="wrap">
+      <div class="eyebrow">05 — Da casa tua</div>
+      <h2>Il cielo visto da <em>Parabiago</em></h2>
+      <p class="lede">45.6° Nord, 8.9° Est. Ecco cosa puoi cercare stasera, dal tuo balcone.</p>
+      <div class="sky-note">
+        <div class="sky-fact">
+          <span class="num">Stella Polare</span>
+          <p>A Parabiago è alta circa 45° sull'orizzonte nord: punta il braccio a metà tra l'orizzonte e lo zenit, verso nord, e la troverai — è lì tutte le notti dell'anno.</p>
+        </div>
+        <div class="sky-fact">
+          <span class="num">Estate</span>
+          <p>Il Triangolo Estivo (Vega, Deneb, Altair) domina il cielo dopo il tramonto: tre stelle luminosissime facili da riconoscere anche con l'inquinamento luminoso della pianura.</p>
+        </div>
+        <div class="sky-fact">
+          <span class="num">Inverno</span>
+          <p>Orione si alza a est dopo cena: la sua cintura di tre stelle è il modo più semplice per orientarsi in tutto il cielo invernale della Lombardia.</p>
+        </div>
+        <div class="sky-fact">
+          <span class="num">Consiglio</span>
+          <p>Il posto migliore vicino a Parabiago per un cielo un po' più buio: allontanarsi dai centri abitati verso il Parco del Roccolo. Un binocolo basta per vedere le lune di Giove.</p>
+        </div>
+      </div>
+      <p style="margin-top:26px;"><a href="https://stellarium-web.org/" target="_blank" rel="noopener">→ Apri Stellarium Web e punta la webcam del cielo sopra Parabiago, in diretta</a></p>
+    </div>
+  </section>
+
+  <!-- SETI / SEGNALI -->
+  <section id="seti">
+    <div class="wrap">
+      <div class="eyebrow">06 — C'è qualcuno là fuori?</div>
+      <h2>Segnali dal <em>buio</em></h2>
+      <p class="lede">La parte scientificamente più inquietante e affascinante insieme. Nessuna prova certa, ma qualche indizio che nessuno ha mai saputo spiegare del tutto.</p>
+
+      <div class="signal-box">
+        <h3>📡 Il segnale "Wow!" — 15 agosto 1977</h3>
+        <p>Il radiotelescopio Big Ear (Ohio) registrò un impulso radio a banda stretta, 30 volte più intenso del rumore di fondo cosmico, sulla frequenza dell'idrogeno neutro (1420 MHz) — proprio la frequenza che gli scienziati ipotizzano userebbe una civiltà per farsi notare. L'astronomo Jerry Ehman scrisse a mano "Wow!" accanto ai dati. Non si è mai ripetuto, e la sua origine resta ufficialmente ignota.</p>
+      </div>
+      <div class="signal-box">
+        <h3>🛰️ Il programma SETI</h3>
+        <p>Dal 1960 a oggi, radiotelescopi in tutto il mondo ascoltano il cielo cercando segnali artificiali. Con il progetto Breakthrough Listen puoi persino prestare il tuo computer per analizzare i dati.</p>
+      </div>
+      <div class="signal-box">
+        <h3>🌌 'Oumuamua — il visitatore del 2017</h3>
+        <p>Il primo oggetto interstellare mai osservato nel Sistema Solare: forma allungata insolita, accelerazione anomala nell'allontanarsi dal Sole. La maggioranza degli astronomi propende per un'origine naturale (cometa/asteroide), ma il caso resta uno dei più dibattuti dell'astronomia recente.</p>
+      </div>
+
+      <div class="drake">"In una galassia con 100-400 miliardi di stelle,<br>quante luci potrebbero star guardando la stessa notte, dall'altra parte?"</div>
+
+      <div class="grid">
+        <div class="card">
+          <span class="tag">Da guardare</span>
+          <h3>Contact (1997)</h3>
+          <p>Con Jodie Foster, ispirato al romanzo di Carl Sagan — il film più scientificamente onesto mai fatto sul primo contatto.</p>
+        </div>
+        <div class="card">
+          <span class="tag">Da leggere</span>
+          <h3>Carl Sagan — "Cosmos"</h3>
+          <p>Il libro che ha reso l'astronomia romantica per intere generazioni. Punto di partenza obbligato.</p>
+        </div>
+        <div class="card">
+          <span class="tag">Da leggere</span>
+          <h3>Paolo Attivissimo — sul segnale Wow!</h3>
+          <p>Un'ottima ricostruzione italiana, con tutte le ipotesi vagliate negli anni.</p>
+          <a class="ext" href="https://www.focus.it/scienza/spazio" target="_blank" rel="noopener">Focus.it — Spazio</a>
+        </div>
+        <div class="card">
+          <span class="tag">Poster</span>
+          <h3>NASA/JPL Visions of the Future</h3>
+          <p>Poster retro-futuristici gratuiti scaricabili in altissima risoluzione, uno per ogni mondo esplorato dalle sonde NASA.</p>
+          <a class="ext" href="https://www.jpl.nasa.gov/galleries/visions-of-the-future" target="_blank" rel="noopener">JPL — scarica i poster</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- TELESCOPI -->
+  <section id="telescopi">
+    <div class="wrap">
+      <div class="eyebrow">07 — Per guardare più vicino</div>
+      <h2>Se un binocolo <em>non ti basta più</em></h2>
+      <p class="lede">Quattro punti di partenza, dal più semplice al più impegnativo — ognuno con quello che puoi realisticamente aspettarti di vedere.</p>
+      <div class="grid" style="gap:18px;">
+        <div class="scope-card">
+          <img src="images/telescopio-rifrattore.jpg" alt="Telescopio rifrattore su treppiede">
+          <div>
+            <span class="price">Da 100-150 €</span>
+            <h3>Rifrattore compatto (es. 70-90mm)</h3>
+            <p>Il classico "cannocchiale" con le lenti: leggero, si monta in pochi minuti, perfetto per Luna, anelli di Saturno e bande di Giove. Il miglior primo telescopio.</p>
+          </div>
+        </div>
+        <div class="scope-card">
+          <img src="images/telescopio-dobson.jpg" alt="Telescopio dobsoniano riflettore">
+          <div>
+            <span class="price">Da 200-350 €</span>
+            <h3>Dobsoniano riflettore (150-200mm)</h3>
+            <p>Uno specchio grande su base semplice: tanta luce raccolta per pochi soldi. Qui iniziano a vedersi galassie e nebulose come macchie luminose reali, non solo puntini.</p>
+          </div>
+        </div>
+        <div class="scope-card">
+          <img src="images/telescopio-viaggio.jpg" alt="Telescopio compatto da viaggio">
+          <div>
+            <span class="price">Da 150-250 €</span>
+            <h3>Compatto da viaggio</h3>
+            <p>Si smonta e sta in uno zaino: ideale per chi vuole portarlo in montagna o al mare, lontano dall'inquinamento luminoso della pianura.</p>
+          </div>
+        </div>
+        <div class="scope-card">
+          <img src="images/binocolo-astronomico.jpg" alt="Binocolo astronomico grande">
+          <div>
+            <span class="price">Da 60-120 €</span>
+            <h3>Binocolo astronomico (10x50 o più)</h3>
+            <p>Il modo più semplice per iniziare davvero: due occhi invece di uno, si punta all'istante, e con un buon 10x50 già si vedono le lune di Giove e gli ammassi stellari.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- GALLERIA -->
+  <section id="galleria">
+    <div class="wrap">
+      <div class="eyebrow">08 — Da guardare in silenzio</div>
+      <h2>Galleria <em>dal cosmo</em></h2>
+      <p class="lede">Immagini ufficiali scattate dalle sonde e dai telescopi spaziali. Cerca esattamente questi titoli per trovare le versioni in alta risoluzione.</p>
+      <div class="gallery">
+        <figure>
+          <img class="photo" src="images/terra-blue-marble.jpg" alt="La Terra vista dallo spazio, Blue Marble">
+          <figcaption>Cerca: <span class="src">"Terra Blue Marble NASA"</span></figcaption>
+        </figure>
+        <figure>
+          <img class="photo" src="images/luna-vicino.jpg" alt="Superficie della Luna ravvicinata">
+          <figcaption>Cerca: <span class="src">"superficie lunare crateri foto NASA"</span></figcaption>
+        </figure>
+        <figure>
+          <img class="photo" src="images/marte-superficie.jpg" alt="Superficie di Marte fotografata da un rover">
+          <figcaption>Cerca: <span class="src">"Marte superficie rover Perseverance panorama"</span></figcaption>
+        </figure>
+        <figure>
+          <img class="photo" src="images/giove-giunone.jpg" alt="Giove fotografato dalla sonda Juno">
+          <figcaption>Cerca: <span class="src">"Giove sonda Juno foto ravvicinata"</span></figcaption>
+        </figure>
+        <figure>
+          <img class="photo" src="images/saturno-cassini.jpg" alt="Saturno e i suoi anelli, sonda Cassini">
+          <figcaption>Cerca: <span class="src">"Saturno anelli sonda Cassini foto"</span></figcaption>
+        </figure>
+        <figure>
+          <img class="photo" src="images/nebulosa-orione.jpg" alt="Nebulosa di Orione">
+          <figcaption>Cerca: <span class="src">"Nebulosa di Orione telescopio foto"</span></figcaption>
+        </figure>
+        <figure>
+          <img class="photo" src="images/via-lattea-centro.jpg" alt="Centro galattico della Via Lattea">
+          <figcaption>Cerca: <span class="src">"centro galattico Via Lattea Sagittarius A"</span></figcaption>
+        </figure>
+        <figure>
+          <img class="photo" src="images/aurora-boreale.jpg" alt="Aurora boreale nel cielo notturno">
+          <figcaption>Cerca: <span class="src">"aurora boreale cielo notturno foto"</span></figcaption>
+        </figure>
+      </div>
+    </div>
+  </section>
+
+  <!-- LINK ALLA PAGINA DELL'ANNO SCORSO -->
+  <section id="legacy-section">
+    <div class="wrap">
+      <div class="legacy">
+        <div>
+          <div class="eyebrow" style="margin-bottom:8px;">Dall'anno scorso</div>
+          <h3 style="font-size:20px; margin-bottom:6px;">La tua pagina del 2025 è ancora lì</h3>
+          <p style="margin:0; max-width:480px;">Citazioni, viaggi, ricette e tutti i segreti nascosti di un anno fa non sono andati da nessuna parte. Puoi continuare a usarla quando vuoi.</p>
+        </div>
+        <a class="btn" href="manu.html">Apri la pagina 2025 →</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- DEDICA -->
+  <section class="dedica" id="dedica">
+    <div class="wrap">
+      <div class="star-icon">✦</div>
+      <p class="msg">Le stelle che vediamo oggi hanno viaggiato per anni, a volte secoli, prima di arrivare fino a noi — la loro luce ci raggiunge anche quando la sorgente, nel frattempo, è cambiata per sempre. Non è una consolazione da poco: quello che ci ha illuminato continua a farlo, molto dopo. Buon compleanno, Manu. Da quassù, o da laggiù, qualcuno oggi ti guarda.</p>
+      <p class="signoff">Con affetto, il tuo prof d'inglese preferito 💛</p>
+    </div>
+  </section>
+
+</main>
+
+<footer>
+  23 agosto — un anno in più, un universo intero da guardare.
+  <br>
+  <a class="btn-top" href="#top" onclick="window.scrollTo({top:0,behavior:'smooth'}); return false;">↑ Torna su</a>
+</footer>
+
+<script>
+/* ============ STARFIELD BACKGROUND ============ */
+(function(){
+  const canvas = document.getElementById('stars-canvas');
+  const scene = new THREE.Scene();
+  const camera = new THREE.PerspectiveCamera(70, innerWidth/innerHeight, 0.1, 1000);
+  camera.position.z = 5;
+  const renderer = new THREE.WebGLRenderer({ canvas, alpha:true, antialias:true });
+  renderer.setPixelRatio(Math.min(devicePixelRatio,2));
+  renderer.setSize(innerWidth, innerHeight);
+
+  function makeStars(count, size, color, spread){
+    const geo = new THREE.BufferGeometry();
+    const positions = new Float32Array(count*3);
+    for(let i=0;i<count;i++){
+      positions[i*3] = (Math.random()-0.5)*spread;
+      positions[i*3+1] = (Math.random()-0.5)*spread;
+      positions[i*3+2] = (Math.random()-0.5)*spread;
+    }
+    geo.setAttribute('position', new THREE.BufferAttribute(positions,3));
+    const mat = new THREE.PointsMaterial({ color, size, transparent:true, opacity:.85 });
+    return new THREE.Points(geo, mat);
+  }
+  const layer1 = makeStars(1800, 0.012, 0xffffff, 12);
+  const layer2 = makeStars(900, 0.02, 0xa56dff, 20);
+  const layer3 = makeStars(500, 0.03, 0x4fd8c4, 30);
+  scene.add(layer1, layer2, layer3);
+
+  let mx=0, my=0;
+  addEventListener('mousemove', e=>{ mx=(e.clientX/innerWidth-0.5); my=(e.clientY/innerHeight-0.5); });
+  addEventListener('resize', ()=>{
+    camera.aspect = innerWidth/innerHeight; camera.updateProjectionMatrix();
+    renderer.setSize(innerWidth, innerHeight);
+  });
+
+  function animate(){
+    requestAnimationFrame(animate);
+    layer1.rotation.y += 0.0002; layer1.rotation.x += 0.00005;
+    layer2.rotation.y -= 0.00015;
+    layer3.rotation.y += 0.0001;
+    camera.position.x += (mx*0.4 - camera.position.x)*0.02;
+    camera.position.y += (-my*0.4 - camera.position.y)*0.02;
+    camera.lookAt(scene.position);
+    renderer.render(scene, camera);
+  }
+  animate();
+})();
+
+/* ============ SOLAR SYSTEM ============ */
+(function(){
+  const el = document.getElementById('solar-canvas');
+  const infoBox = document.getElementById('planet-info');
+  const width = el.clientWidth, height = 520;
+  el.width = width; el.height = height;
+
+  const scene = new THREE.Scene();
+  const camera = new THREE.PerspectiveCamera(50, width/height, 0.1, 1000);
+  camera.position.set(0, 8, 15);
+  camera.lookAt(0,0,0);
+  const renderer = new THREE.WebGLRenderer({ canvas: el, alpha:true, antialias:true });
+  renderer.setPixelRatio(Math.min(devicePixelRatio,2));
+  renderer.setSize(width, height);
+
+  const group = new THREE.Group();
+  scene.add(group);
+
+  const sunLight = new THREE.PointLight(0xffe9b0, 2.4, 100);
+  scene.add(sunLight);
+  scene.add(new THREE.AmbientLight(0x8899ff, 0.35));
+
+  const sunGeo = new THREE.SphereGeometry(1.1, 32, 32);
+  const sunMat = new THREE.MeshBasicMaterial({ color:0xf4cf6e });
+  const sun = new THREE.Mesh(sunGeo, sunMat);
+  group.add(sun);
+
+  const planetsData = [
+    { name:'Mercurio', color:0x9c9c9c, size:0.22, dist:2.2, speed:0.012, info:'Il più veloce e il più vicino al Sole: un anno dura solo 88 giorni terrestri. Escursioni termiche di oltre 600°C tra giorno e notte.' },
+    { name:'Venere', color:0xe8c97a, size:0.34, dist:3.0, speed:0.009, info:'Il pianeta più caldo del sistema solare (460°C), per l\\'effetto serra della sua atmosfera di CO₂. Ruota al contrario rispetto agli altri.' },
+    { name:'Terra', color:0x4f8ff0, size:0.36, dist:3.9, speed:0.008, info:'L\\'unico mondo conosciuto con vita. Il 71% della superficie è coperto d\\'acqua. Casa nostra, e per ora l\\'unica.' },
+    { name:'Marte', color:0xd06a4a, size:0.28, dist:4.8, speed:0.0065, info:'Il Pianeta Rosso, colorato dall\\'ossido di ferro. Ospita il vulcano più grande del sistema solare, l\\'Olympus Mons, alto quasi 22 km.' },
+    { name:'Giove', color:0xd9b48f, size:0.85, dist:6.6, speed:0.004, info:'Il gigante gassoso: la sua Grande Macchia Rossa è una tempesta grande più della Terra, attiva da almeno 350 anni.' },
+    { name:'Saturno', color:0xe4d29a, size:0.75, dist:8.4, speed:0.003, info:'Famoso per gli anelli, fatti di ghiaccio e roccia. È così poco denso che, in teoria, galleggerebbe in una vasca d\\'acqua abbastanza grande.' },
+    { name:'Urano', color:0x9fdde0, size:0.5, dist:10.0, speed:0.0021, info:'Ruota "sdraiato su un fianco", con un\\'inclinazione assiale di 98°. Ogni suo polo ha 42 anni di luce continua, poi 42 di buio.' },
+    { name:'Nettuno', color:0x5077e0, size:0.48, dist:11.4, speed:0.0017, info:'Il pianeta più ventoso: raffiche fino a 2100 km/h. Ci mette 165 anni terrestri a completare un\\'orbita intorno al Sole.' },
+  ];
+
+  const planetMeshes = [];
+  planetsData.forEach(p=>{
+    const orbitGeo = new THREE.RingGeometry(p.dist-0.01, p.dist+0.01, 128);
+    const orbitMat = new THREE.MeshBasicMaterial({ color:0x3a3f66, side:THREE.DoubleSide, transparent:true, opacity:.35 });
+    const orbit = new THREE.Mesh(orbitGeo, orbitMat);
+    orbit.rotation.x = Math.PI/2;
+    group.add(orbit);
+
+    const geo = new THREE.SphereGeometry(p.size, 24, 24);
+    const mat = new THREE.MeshStandardMaterial({ color:p.color, roughness:.7, metalness:.1 });
+    const mesh = new THREE.Mesh(geo, mat);
+    mesh.userData = p;
+    group.add(mesh);
+    planetMeshes.push({ mesh, dist:p.dist, speed:p.speed, angle:Math.random()*Math.PI*2 });
+  });
+
+  // drag to rotate
+  let isDragging=false, prevX=0, prevY=0, rotY=0.4, rotX=0.25;
+  el.addEventListener('pointerdown', e=>{ isDragging=true; prevX=e.clientX; prevY=e.clientY; });
+  addEventListener('pointerup', ()=> isDragging=false);
+  addEventListener('pointermove', e=>{
+    if(!isDragging) return;
+    rotY += (e.clientX-prevX)*0.005;
+    rotX += (e.clientY-prevY)*0.003;
+    rotX = Math.max(-0.8, Math.min(0.8, rotX));
+    prevX=e.clientX; prevY=e.clientY;
+  });
+
+  // click to select
+  const raycaster = new THREE.Raycaster();
+  const mouse = new THREE.Vector2();
+  el.addEventListener('click', e=>{
+    const rect = el.getBoundingClientRect();
+    mouse.x = ((e.clientX-rect.left)/rect.width)*2-1;
+    mouse.y = -((e.clientY-rect.top)/rect.height)*2+1;
+    raycaster.setFromCamera(mouse, camera);
+    const hits = raycaster.intersectObjects(planetMeshes.map(p=>p.mesh));
+    if(hits.length){
+      const d = hits[0].object.userData;
+      infoBox.innerHTML = `<div class="pname">${d.name}</div><div class="pmeta">Distanza relativa dal Sole: ${d.dist.toFixed(1)}</div><p style="margin:0;color:var(--ink-dim);font-size:14.5px;">${d.info}</p>`;
+    }
+  });
+
+  addEventListener('resize', ()=>{
+    const w = el.clientWidth;
+    camera.aspect = w/height; camera.updateProjectionMatrix();
+    renderer.setSize(w, height);
+  });
+
+  function animate(){
+    requestAnimationFrame(animate);
+    planetMeshes.forEach(p=>{
+      p.angle += p.speed;
+      p.mesh.position.set(Math.cos(p.angle)*p.dist, 0, Math.sin(p.angle)*p.dist);
+    });
+    group.rotation.y = rotY;
+    group.rotation.x = rotX;
+    sunLight.position.set(0,0,0);
+    renderer.render(scene, camera);
+  }
+  animate();
+})();
+</script>
+</body>
+</html>
