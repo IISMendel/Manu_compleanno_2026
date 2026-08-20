@@ -921,6 +921,20 @@
 </footer>
 
 <script>
+/* texture puntiforme circolare condivisa, per evitare che i punti (stelle, asteroidi) appaiano come quadrati */
+function makeDotTexture(){
+  const c = document.createElement('canvas');
+  c.width = c.height = 32;
+  const ctx = c.getContext('2d');
+  const g = ctx.createRadialGradient(16,16,0,16,16,16);
+  g.addColorStop(0, 'rgba(255,255,255,1)');
+  g.addColorStop(0.5, 'rgba(255,255,255,0.7)');
+  g.addColorStop(1, 'rgba(255,255,255,0)');
+  ctx.fillStyle = g; ctx.fillRect(0,0,32,32);
+  return new THREE.CanvasTexture(c);
+}
+const DOT_TEX = makeDotTexture();
+
 /* ============ STARFIELD BACKGROUND ============ */
 (function(){
   const canvas = document.getElementById('stars-canvas');
@@ -940,13 +954,14 @@
       positions[i*3+2] = (Math.random()-0.5)*spread;
     }
     geo.setAttribute('position', new THREE.BufferAttribute(positions,3));
-    const mat = new THREE.PointsMaterial({ color, size, transparent:true, opacity:.85 });
+    const mat = new THREE.PointsMaterial({ color, size, map:DOT_TEX, transparent:true, opacity:.85, depthWrite:false });
     return new THREE.Points(geo, mat);
   }
   const layer1 = makeStars(1800, 0.012, 0xffffff, 12);
   const layer2 = makeStars(900, 0.02, 0xa56dff, 20);
   const layer3 = makeStars(500, 0.03, 0x4fd8c4, 30);
   scene.add(layer1, layer2, layer3);
+
 
   let mx=0, my=0;
   addEventListener('mousemove', e=>{ mx=(e.clientX/innerWidth-0.5); my=(e.clientY/innerHeight-0.5); });
@@ -1000,7 +1015,7 @@
     }
     const geo = new THREE.BufferGeometry();
     geo.setAttribute('position', new THREE.BufferAttribute(positions,3));
-    const mat = new THREE.PointsMaterial({ color:0xffffff, size:0.06, transparent:true, opacity:.55 });
+    const mat = new THREE.PointsMaterial({ color:0xffffff, size:0.06, map:DOT_TEX, transparent:true, opacity:.55, depthWrite:false });
     scene.add(new THREE.Points(geo, mat));
   })();
 
@@ -1036,6 +1051,7 @@
   const sunGeo = new THREE.SphereGeometry(1.15, 48, 48);
   const sunMat = new THREE.MeshBasicMaterial({ map:makeSurfaceTexture('#f9dd7e','#ffb84f',true) });
   const sun = new THREE.Mesh(sunGeo, sunMat);
+  sun.userData = { name:'Sole', dist:0, link:'https://science.nasa.gov/sun/', info:'Una stella di media grandezza, ma da sola pesa il 99,8% di tutta la massa del Sistema Solare. La sua luce impiega circa 8 minuti e 20 secondi ad arrivare fino a noi.' };
   group.add(sun);
 
   const glowCanvas = document.createElement('canvas');
@@ -1139,7 +1155,7 @@
     }
     const geo = new THREE.BufferGeometry();
     geo.setAttribute('position', new THREE.BufferAttribute(positions,3));
-    const mat = new THREE.PointsMaterial({ color:0x8a8378, size:0.045 });
+    const mat = new THREE.PointsMaterial({ color:0x8a8378, size:0.045, map:DOT_TEX, transparent:true, depthWrite:false });
     group.add(new THREE.Points(geo, mat));
   })();
 
@@ -1163,10 +1179,11 @@
     mouse.x = ((e.clientX-rect.left)/rect.width)*2-1;
     mouse.y = -((e.clientY-rect.top)/rect.height)*2+1;
     raycaster.setFromCamera(mouse, camera);
-    const hits = raycaster.intersectObjects(planetMeshes.map(p=>p.mesh));
+    const hits = raycaster.intersectObjects(planetMeshes.map(p=>p.mesh).concat([sun]));
     if(hits.length){
       const d = hits[0].object.userData;
-      infoBox.innerHTML = `<div class="pname">${d.name}</div><div class="pmeta">Distanza relativa dal Sole: ${d.dist.toFixed(1)}</div><p style="margin:0 0 10px;color:var(--ink-dim);font-size:14.5px;">${d.info}</p><a class="ext" href="${d.link}" target="_blank" rel="noopener" style="text-decoration:none;font-size:13px;font-weight:600;">Scheda ufficiale NASA</a>`;
+      const metaLine = d.name === 'Sole' ? 'Al centro di tutto' : `Distanza relativa dal Sole: ${d.dist.toFixed(1)}`;
+      infoBox.innerHTML = `<div class="pname">${d.name}</div><div class="pmeta">${metaLine}</div><p style="margin:0 0 10px;color:var(--ink-dim);font-size:14.5px;">${d.info}</p><a class="ext" href="${d.link}" target="_blank" rel="noopener" style="text-decoration:none;font-size:13px;font-weight:600;">Scheda ufficiale NASA</a>`;
     }
   });
 
