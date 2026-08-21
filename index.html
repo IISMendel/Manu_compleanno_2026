@@ -73,6 +73,10 @@
   .card a.ext::after{ content:'→'; transition:transform .2s ease; }
   .card a.ext:hover::after{ transform:translateX(3px); }
 
+  /* pulsanti "play" ben visibili per la sezione musica */
+  .play-btn{ display:inline-flex; align-items:center; gap:8px; margin-top:16px; padding:10px 18px; border-radius:999px; background:var(--nebula); color:#0b0f22 !important; font-weight:700; font-size:13.5px; text-decoration:none !important; border:none; }
+  .play-btn:hover{ background:var(--starlight); }
+
   /* TIMELINE (fenomeni) */
   .timeline{ position:relative; padding-left:28px; border-left:1px solid var(--line); }
   .tl-item{ position:relative; padding-bottom:34px; }
@@ -189,37 +193,37 @@
           <span class="tag">Playlist ambient</span>
           <h3>Ambient Space Music</h3>
           <p>Atmosfere lunghe e rilassanti, perfette come sottofondo continuo.</p>
-          <a class="ext" href="https://www.youtube.com/playlist?list=PLflfsQfCiHkuTpn7Cofyw0ZKGTHfpGkOy" target="_blank" rel="noopener">▶ Ascolta su YouTube</a>
+          <a class="play-btn" href="https://www.youtube.com/playlist?list=PLflfsQfCiHkuTpn7Cofyw0ZKGTHfpGkOy" target="_blank" rel="noopener">▶ Ascolta su YouTube</a>
         </div>
         <div class="card">
           <span class="tag">Playlist in italiano</span>
           <h3>Musica spaziale</h3>
           <p>Una raccolta interamente in italiano dedicata al tema dello spazio.</p>
-          <a class="ext" href="https://www.youtube.com/playlist?list=PLG7l9voG4I0MXurdgQ2I3pPHEYEejWCcP" target="_blank" rel="noopener">▶ Ascolta su YouTube</a>
+          <a class="play-btn" href="https://www.youtube.com/playlist?list=PLG7l9voG4I0MXurdgQ2I3pPHEYEejWCcP" target="_blank" rel="noopener">▶ Ascolta su YouTube</a>
         </div>
         <div class="card">
           <span class="tag">Playlist ambient/sci-fi</span>
           <h3>Space Ambient Background Music</h3>
           <p>Atmosfere più cinematografiche, leggermente più cupe — perfette per la sezione buchi neri.</p>
-          <a class="ext" href="https://www.youtube.com/playlist?list=PLQAuJ2UwHIbGWvN5WdOU87KMkZamGaJeu" target="_blank" rel="noopener">▶ Ascolta su YouTube</a>
+          <a class="play-btn" href="https://www.youtube.com/playlist?list=PLQAuJ2UwHIbGWvN5WdOU87KMkZamGaJeu" target="_blank" rel="noopener">▶ Ascolta su YouTube</a>
         </div>
         <div class="card">
           <span class="tag">Mix epico</span>
           <h3>1 Hour of Epic Space Music — Cosmos Vol. 2</h3>
           <p>Un'ora di musica epica a tema spazio, in loop continuo.</p>
-          <a class="ext" href="https://www.youtube.com/watch?v=imtPF2b2Q4M&list=RDimtPF2b2Q4M&start_radio=1" target="_blank" rel="noopener">▶ Ascolta su YouTube</a>
+          <a class="play-btn" href="https://www.youtube.com/watch?v=imtPF2b2Q4M&list=RDimtPF2b2Q4M&start_radio=1" target="_blank" rel="noopener">▶ Ascolta su YouTube</a>
         </div>
         <div class="card">
           <span class="tag">Radio playlist</span>
           <h3>Ambient mix</h3>
           <p>Un'altra selezione ambient, in riproduzione automatica a catena su YouTube.</p>
-          <a class="ext" href="https://www.youtube.com/watch?v=NRwoqT6JBRA&list=RDNRwoqT6JBRA&start_radio=1" target="_blank" rel="noopener">▶ Ascolta su YouTube</a>
+          <a class="play-btn" href="https://www.youtube.com/watch?v=NRwoqT6JBRA&list=RDNRwoqT6JBRA&start_radio=1" target="_blank" rel="noopener">▶ Ascolta su YouTube</a>
         </div>
         <div class="card">
           <span class="tag">Un brano</span>
           <h3>Da ascoltare</h3>
           <p>Un altro pezzo scelto per l'atmosfera di questa pagina.</p>
-          <a class="ext" href="https://www.youtube.com/watch?v=41Y6xov0ppw" target="_blank" rel="noopener">▶ Ascolta su YouTube</a>
+          <a class="play-btn" href="https://www.youtube.com/watch?v=41Y6xov0ppw" target="_blank" rel="noopener">▶ Ascolta su YouTube</a>
         </div>
       </div>
     </div>
@@ -394,7 +398,7 @@
       <p class="lede">Un secolo di cielo, in anteprima. Alcuni di questi eventi li vedrai tu, altri li vedranno i tuoi nipoti — ma sono già scritti nelle orbite.</p>
       <div class="timeline">
         <div class="tl-item">
-          <div class="tl-year">12 agosto 2026</div>
+          <div class="tl-year">12 agosto 2026 <span style="font-size:14px; font-weight:400; color:var(--ink-dim);">... ops, vedi video 😂</span></div>
           <h4>Eclissi totale di Sole — Spagna, Islanda, Groenlandia</h4>
           <p>La rivincita di quest'anno: visibile bene dall'Europa occidentale, in particolare dalla Spagna nel tardo pomeriggio. Dall'Italia parziale.</p>
         </div>
