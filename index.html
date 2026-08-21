@@ -1191,6 +1191,39 @@ const DOT_TEX = makeDotTexture();
   const layer3 = makeStars(500, 0.03, 0x4fd8c4, 30);
   scene.add(layer1, layer2, layer3);
 
+  /* --- stelle "iperspazio": ci vengono incontro e ci sfiorano, poi ripartono da lontano --- */
+  function makeWarpField(count, color, size, speedMin, speedMax){
+    const geo = new THREE.BufferGeometry();
+    const positions = new Float32Array(count*3);
+    const speeds = new Float32Array(count);
+    for(let i=0;i<count;i++){
+      positions[i*3] = (Math.random()-0.5)*16;
+      positions[i*3+1] = (Math.random()-0.5)*10;
+      positions[i*3+2] = -60 + Math.random()*65; // sparse lungo tutta la profondità fin dall'inizio
+      speeds[i] = speedMin + Math.random()*(speedMax-speedMin);
+    }
+    geo.setAttribute('position', new THREE.BufferAttribute(positions,3));
+    const mat = new THREE.PointsMaterial({ color, size, map:DOT_TEX, transparent:true, opacity:.9, depthWrite:false, blending:THREE.AdditiveBlending, sizeAttenuation:true });
+    const points = new THREE.Points(geo, mat);
+    return { points, speeds, count };
+  }
+  const warpField = makeWarpField(340, 0xffffff, 0.045, 0.05, 0.16);
+  const warpField2 = makeWarpField(120, 0xa56dff, 0.06, 0.04, 0.1);
+  scene.add(warpField.points, warpField2.points);
+
+  function updateWarpField(wf, camZ){
+    const pos = wf.points.geometry.attributes.position.array;
+    for(let i=0;i<wf.count;i++){
+      pos[i*3+2] += wf.speeds[i];
+      if(pos[i*3+2] > camZ + 1.5){
+        pos[i*3+2] = -60 - Math.random()*15;
+        pos[i*3] = (Math.random()-0.5)*16;
+        pos[i*3+1] = (Math.random()-0.5)*10;
+      }
+    }
+    wf.points.geometry.attributes.position.needsUpdate = true;
+  }
+
   /* --- stelle cadenti / comete --- */
   function makeCometTexture(){
     const c = document.createElement('canvas');
@@ -1225,27 +1258,61 @@ const DOT_TEX = makeDotTexture();
   let nextCometAt = 90 + Math.random()*180;
   let frameCount = 0;
 
-  /* --- supernova / onda d'urto --- */
+  /* --- supernova / onda d'urto (versione potenziata) --- */
   const shockwaves = [];
+  const SUPERNOVA_COLORS = [0xff8a5c, 0xa56dff, 0x4fd8c4, 0xf4cf6e];
   function spawnSupernova(){
     const x = (Math.random()-0.5)*10;
     const y = (Math.random()-0.5)*6;
-    const z = (Math.random()-0.5)*6 - 2;
-    const flashGeo = new THREE.SphereGeometry(0.05, 16, 16);
-    const flashMat = new THREE.MeshBasicMaterial({ color:0xfff2d0, transparent:true, opacity:1, blending:THREE.AdditiveBlending, depthWrite:false });
+    const z = (Math.random()-0.5)*4 - 1;
+    const tint = SUPERNOVA_COLORS[Math.floor(Math.random()*SUPERNOVA_COLORS.length)];
+
+    // flash centrale grande, luce vera che illumina le stelle vicine
+    const flashGeo = new THREE.SphereGeometry(0.08, 20, 20);
+    const flashMat = new THREE.MeshBasicMaterial({ color:0xffffff, transparent:true, opacity:1, blending:THREE.AdditiveBlending, depthWrite:false });
     const flash = new THREE.Mesh(flashGeo, flashMat);
     flash.position.set(x,y,z);
     scene.add(flash);
 
-    const ringGeo = new THREE.RingGeometry(0.02, 0.05, 48);
-    const ringMat = new THREE.MeshBasicMaterial({ color:0xa56dff, transparent:true, opacity:.9, side:THREE.DoubleSide, blending:THREE.AdditiveBlending, depthWrite:false });
-    const ring = new THREE.Mesh(ringGeo, ringMat);
-    ring.position.set(x,y,z);
-    scene.add(ring);
+    const burstLight = new THREE.PointLight(tint, 6, 14, 1.5);
+    burstLight.position.set(x,y,z);
+    scene.add(burstLight);
 
-    shockwaves.push({ flash, ring, life:0, maxLife:70 });
+    // due anelli concentrici, sfasati, colori diversi
+    const rings = [0,1].map(i=>{
+      const ringGeo = new THREE.RingGeometry(0.02, 0.06, 64);
+      const ringMat = new THREE.MeshBasicMaterial({ color: i===0 ? tint : 0xffffff, transparent:true, opacity:.95, side:THREE.DoubleSide, blending:THREE.AdditiveBlending, depthWrite:false });
+      const ring = new THREE.Mesh(ringGeo, ringMat);
+      ring.position.set(x,y,z);
+      ring.rotation.set(Math.random()*Math.PI, Math.random()*Math.PI, 0);
+      scene.add(ring);
+      return ring;
+    });
+
+    // sciame di detriti che schizzano fuori dal centro
+    const debrisCount = 46;
+    const debrisGeo = new THREE.BufferGeometry();
+    const debrisPos = new Float32Array(debrisCount*3);
+    const debrisVel = [];
+    for(let i=0;i<debrisCount;i++){
+      debrisPos[i*3]=x; debrisPos[i*3+1]=y; debrisPos[i*3+2]=z;
+      const theta = Math.random()*Math.PI*2;
+      const phi = Math.acos((Math.random()*2)-1);
+      const speed = 0.03 + Math.random()*0.05;
+      debrisVel.push([
+        Math.sin(phi)*Math.cos(theta)*speed,
+        Math.sin(phi)*Math.sin(theta)*speed,
+        Math.cos(phi)*speed
+      ]);
+    }
+    debrisGeo.setAttribute('position', new THREE.BufferAttribute(debrisPos,3));
+    const debrisMat = new THREE.PointsMaterial({ color:tint, size:0.05, map:DOT_TEX, transparent:true, opacity:1, blending:THREE.AdditiveBlending, depthWrite:false });
+    const debris = new THREE.Points(debrisGeo, debrisMat);
+    scene.add(debris);
+
+    shockwaves.push({ flash, burstLight, rings, debris, debrisVel, life:0, maxLife:95 });
   }
-  let nextSupernovaAt = 600 + Math.random()*900;
+  let nextSupernovaAt = 500 + Math.random()*700;
 
   let mx=0, my=0;
   addEventListener('mousemove', e=>{ mx=(e.clientX/innerWidth-0.5); my=(e.clientY/innerHeight-0.5); });
@@ -1263,6 +1330,9 @@ const DOT_TEX = makeDotTexture();
     camera.position.x += (mx*0.4 - camera.position.x)*0.02;
     camera.position.y += (-my*0.4 - camera.position.y)*0.02;
     camera.lookAt(scene.position);
+
+    updateWarpField(warpField, camera.position.z);
+    updateWarpField(warpField2, camera.position.z);
 
     // stelle cadenti
     if(frameCount >= nextCometAt){
@@ -1282,7 +1352,7 @@ const DOT_TEX = makeDotTexture();
       }
     }
 
-    // supernova rara
+    // supernova rara, ora molto più d'impatto
     if(frameCount >= nextSupernovaAt){
       spawnSupernova();
       nextSupernovaAt = frameCount + 900 + Math.random()*1400;
@@ -1291,13 +1361,35 @@ const DOT_TEX = makeDotTexture();
       const s = shockwaves[i];
       s.life++;
       const t = s.life / s.maxLife;
-      const scale = 0.3 + t*7;
-      s.ring.scale.set(scale, scale, scale);
-      s.ring.material.opacity = Math.max(0, 0.9*(1-t));
-      s.flash.material.opacity = Math.max(0, 1-t*3);
-      s.flash.scale.setScalar(1 + t*2);
+
+      // flash: crescita rapida e spegnimento veloce
+      const flashScale = 1 + t*14;
+      s.flash.scale.setScalar(Math.max(0.01, (1-t*2.2)) * flashScale*0.15 + 1);
+      s.flash.material.opacity = Math.max(0, 1 - t*3.5);
+      s.burstLight.intensity = Math.max(0, 6*(1-t*2.5));
+
+      // anelli: espansione a velocità leggermente diverse
+      s.rings.forEach((ring, idx)=>{
+        const rt = Math.min(1, t*(1+idx*0.35));
+        const scale = 0.3 + rt*9;
+        ring.scale.set(scale, scale, scale);
+        ring.material.opacity = Math.max(0, 0.95*(1-rt));
+      });
+
+      // detriti che continuano ad allontanarsi e a svanire
+      const pos = s.debris.geometry.attributes.position.array;
+      for(let d=0; d<s.debrisVel.length; d++){
+        pos[d*3] += s.debrisVel[d][0];
+        pos[d*3+1] += s.debrisVel[d][1];
+        pos[d*3+2] += s.debrisVel[d][2];
+      }
+      s.debris.geometry.attributes.position.needsUpdate = true;
+      s.debris.material.opacity = Math.max(0, 1 - t*1.15);
+
       if(s.life >= s.maxLife){
-        scene.remove(s.ring); scene.remove(s.flash);
+        scene.remove(s.flash); scene.remove(s.burstLight);
+        s.rings.forEach(r=>scene.remove(r));
+        scene.remove(s.debris);
         shockwaves.splice(i,1);
       }
     }
